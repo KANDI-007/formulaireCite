@@ -57,7 +57,7 @@ export default function PersonalInfoForm({ data, onChange }: PersonalInfoFormPro
                 ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-300'
                 : 'border-gray-300 focus:border-ucao-blue-500'
             }`}
-            placeholder="Jean"
+            placeholder="Ditoma Didier "
           />
           {errors.firstName && (
             <p className="text-red-600 text-xs mt-1 flex items-center">
@@ -81,7 +81,7 @@ export default function PersonalInfoForm({ data, onChange }: PersonalInfoFormPro
                 ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-300'
                 : 'border-gray-300 focus:border-ucao-blue-500'
             }`}
-            placeholder="Dupont"
+            placeholder="NORAMA"
           />
           {errors.lastName && (
             <p className="text-red-600 text-xs mt-1 flex items-center">
