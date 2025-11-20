@@ -89,12 +89,20 @@ function App() {
 
     try {
       if (!isSupabaseConfigured || !supabase) {
-        throw new Error(
-          'Supabase n’est pas configuré. Vérifiez vos variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY.'
-        );
+        const errorMsg = 'Supabase n'est pas configuré. Vérifiez vos variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans les paramètres Netlify.';
+        console.error('❌ Supabase not configured:', {
+          isSupabaseConfigured,
+          hasSupabase: !!supabase,
+          env: {
+            VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL ? 'SET' : 'NOT SET',
+            VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET',
+          },
+        });
+        throw new Error(errorMsg);
       }
 
-      const { error: supabaseError } = await supabase.from('resident_forms').insert([
+      console.log('📤 Submitting form data to Supabase...');
+      const { data, error: supabaseError } = await supabase.from('resident_forms').insert([
         {
           first_name: formData.personalInfo.firstName,
           last_name: formData.personalInfo.lastName,
@@ -105,17 +113,36 @@ function App() {
           program_choices: formData.programChoices,
           submitted_at: new Date().toISOString(),
         },
-      ]);
+      ]).select();
 
       if (supabaseError) {
-        throw supabaseError;
+        console.error('❌ Supabase insertion error:', {
+          message: supabaseError.message,
+          details: supabaseError.details,
+          hint: supabaseError.hint,
+          code: supabaseError.code,
+        });
+        
+        // Messages d'erreur plus spécifiques
+        let errorMessage = 'Une erreur est survenue lors de l\'envoi.';
+        if (supabaseError.code === 'PGRST116') {
+          errorMessage = 'Erreur : La table "resident_forms" n\'existe pas ou vous n\'avez pas les permissions. Vérifiez votre configuration Supabase.';
+        } else if (supabaseError.code === '23505') {
+          errorMessage = 'Cette soumission existe déjà.';
+        } else if (supabaseError.message) {
+          errorMessage = `Erreur Supabase: ${supabaseError.message}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
+      console.log('✅ Form submitted successfully:', data);
       clearDraft();
       setIsSuccess(true);
     } catch (err) {
-      console.error('Submission error:', err);
-      setError('Une erreur est survenue. Veuillez réessayer.');
+      console.error('❌ Submission error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
