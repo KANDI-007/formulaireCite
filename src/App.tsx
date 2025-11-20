@@ -89,7 +89,7 @@ function App() {
 
     try {
       if (!isSupabaseConfigured || !supabase) {
-        const errorMsg = 'Supabase n'est pas configuré. Vérifiez vos variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans les paramètres Netlify.';
+        const errorMsg = "Supabase n'est pas configuré. Vérifiez vos variables VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans les paramètres Netlify.";
         console.error('❌ Supabase not configured:', {
           isSupabaseConfigured,
           hasSupabase: !!supabase,
